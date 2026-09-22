@@ -58,3 +58,41 @@ jobs:
 
       - name: Run Semgrep
         run: semgrep scan --config=auto .
+
+  trivy:
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Trivy filesystem scan
+        uses: aquasecurity/trivy-action@0.36.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          format: json
+          output: trivy-fs-report.json
+          severity: HIGH,CRITICAL
+          exit-code: "0"
+
+      - name: Build Docker image for Trivy
+        run: docker build -t calculator-api:trivy .
+
+      - name: Trivy Docker image scan
+        uses: aquasecurity/trivy-action@0.36.0
+        with:
+          image-ref: calculator-api:trivy
+          format: json
+          output: trivy-image-report.json
+          severity: HIGH,CRITICAL
+          exit-code: "0"
+
+      - name: Upload Trivy reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-reports
+          path: |
+            trivy-fs-report.json
+            trivy-image-report.json
