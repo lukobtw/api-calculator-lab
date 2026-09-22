@@ -44,3 +44,17 @@ jobs:
 
       - name: Show Docker images
         run: docker images
+
+  semgrep:
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Install Semgrep
+        run: pip install semgrep
+
+      - name: Run Semgrep
+        run: semgrep scan --config=auto .
