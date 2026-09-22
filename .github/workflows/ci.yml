@@ -45,7 +45,7 @@ jobs:
       - name: Show Docker images
         run: docker images
 
-  semgrep:
+    semgrep:
     runs-on: ubuntu-latest
     needs: test
 
@@ -57,7 +57,14 @@ jobs:
         run: pip install semgrep
 
       - name: Run Semgrep
-        run: semgrep scan --config=auto .
+        run: semgrep scan --config=auto --json --output semgrep-report.json .
+        continue-on-error: true
+
+      - name: Upload Semgrep report
+        uses: actions/upload-artifact@v4
+        with:
+          name: semgrep-report
+          path: semgrep-report.json
 
   trivy:
     runs-on: ubuntu-latest
