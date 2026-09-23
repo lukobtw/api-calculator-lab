@@ -19,15 +19,15 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
       - name: Set up Python
-        uses: actions/setup-python@v7
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
         with:
           python-version: "3.11"
 
       - name: Install dependencies
-        run: pip install --no-cache-dir -r requirements.txt
+        run: pip install --no-cache-dir -r requirements-dev.txt
 
       - name: Run tests
         run: python -m pytest -v
@@ -39,10 +39,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
       - name: Build Docker image
-        run: docker build -t calculator-api:${{ github.sha }} .
+        run: docker build --pull --no-cache -t calculator-api:${{ github.sha }} .
 
       - name: Show Docker images
         run: docker images
@@ -54,7 +54,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
       - name: Install Semgrep
         run: pip install semgrep
@@ -64,7 +64,7 @@ jobs:
         continue-on-error: true
 
       - name: Upload Semgrep report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: semgrep-report
           path: semgrep-report.json
@@ -76,10 +76,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
       - name: Trivy filesystem scan
-        uses: aquasecurity/trivy-action@v0.36.0
+        uses: aquasecurity/trivy-action@a9c7b0f06e461e9d4b4d1711f154ee024b8d7ab8 # v0.36.0
         with:
           scan-type: fs
           scan-ref: .
@@ -89,10 +89,10 @@ jobs:
           exit-code: "0"
 
       - name: Build Docker image for Trivy
-        run: docker build -t calculator-api:trivy .
+        run: docker build --pull --no-cache -t calculator-api:trivy .
 
       - name: Trivy Docker image scan
-        uses: aquasecurity/trivy-action@v0.36.0
+        uses: aquasecurity/trivy-action@a9c7b0f06e461e9d4b4d1711f154ee024b8d7ab8 # v0.36.0
         with:
           image-ref: calculator-api:trivy
           format: json
@@ -101,7 +101,7 @@ jobs:
           exit-code: "0"
 
       - name: Upload Trivy reports
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: trivy-reports
           path: |
